@@ -5,5 +5,7 @@ const router = Router();
 
 router.get("/users", userController.getAllUsers);
 router.get("/users/:id", userController.getOneUser);
+router.patch("/users/:id", userController.updateUser);
+
 
 export { router };

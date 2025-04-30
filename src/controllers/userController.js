@@ -22,6 +22,21 @@ const userController = {
         res.status(200).json(user);
     },
 
+    async updateUser(req, res) {
+    
+        const id = req.params.id;
+        
+        const user = await User.findByPk(id);
+        if (!user){
+            return res.status(400).json({ error: "Utilisateur non trouvé." });
+        }
+
+        const { firstname, lastname, email, password } = req.body;
+        await user.update({ firstname, lastname, email, password });
+
+        res.status(200).json(user);
+    },
+
 }
 
 export { userController };
