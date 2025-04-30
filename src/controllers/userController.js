@@ -23,7 +23,6 @@ const userController = {
     },
 
     async updateUser(req, res) {
-    
         const id = req.params.id;
         
         const user = await User.findByPk(id);
@@ -35,6 +34,19 @@ const userController = {
         await user.update({ firstname, lastname, email, password });
 
         res.status(200).json(user);
+    },
+
+    async deleteUser(req, res) {
+        const id = req.params.id;
+
+        const user = await User.findByPk(id);
+        if (!user){
+            return res.status(400).json({ error: "Utilisateur non trouvé." });
+        }
+
+        await user.destroy();
+
+        res.status(204);
     },
 
 }
