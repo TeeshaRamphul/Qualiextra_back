@@ -3,7 +3,6 @@ import { User } from "../models/User.js";
 const userController = {
 
     async getAllUsers(req, res) {
-        // Récupérer toutes les listes de la DB
         const users = await User.findAll();
       
         if (!users){
@@ -11,6 +10,18 @@ const userController = {
         }
         res.status(200).json(users);
     },
+
+    async getOneUser(req, res) {
+        const id = req.params.id;
+
+        const user = await User.findByPk(id);
+        if (!user){
+            return res.status(400).json({ error: "Utilisateur non trouvé." });
+        }
+
+        res.status(200).json(user);
+    },
+
 }
 
 export { userController };
