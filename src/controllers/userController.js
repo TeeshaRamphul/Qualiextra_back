@@ -70,6 +70,10 @@ const userController = {
     async getOneUser(req, res) {
         const id = req.params.id;
 
+        if (req.user.role !== 'admin' && req.user.id != id) {
+            return res.status(403).json({ error: "Vous ne pouvez accéder qu'à votre propre profil." });
+        }
+
         const user = await User.findByPk(id);
         if (!user){
             return res.status(400).json({ error: "Utilisateur non trouvé." });
@@ -80,6 +84,10 @@ const userController = {
 
     async updateUser(req, res) {
         const id = req.params.id;
+
+        if (req.user.role !== 'admin' && req.user.id != id) {
+            return res.status(403).json({ error: "Vous ne pouvez modifier que votre propre profil." });
+        }
         
         const user = await User.findByPk(id);
         if (!user){
@@ -98,6 +106,10 @@ const userController = {
         const user = await User.findByPk(id);
         if (!user){
             return res.status(400).json({ error: "Utilisateur non trouvé." });
+        }
+
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ error: "Vous n'êtes pas autorisé à supprimer cet utilisateur." });
         }
 
         await user.destroy();
