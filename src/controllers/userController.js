@@ -58,6 +58,39 @@ const userController = {
         }
     },
 
+    async loginUser(req, res) {
+        try {
+            // Récupérer l'email et le mot de passe fourni depuis req.body
+            const { email, password } = req.body;
+
+            // Valider la présence des champs -> sinon 400
+            if (! email || ! password) {
+            return res.status(400).json({ error: "Tous les champs sont obligatoires." });
+            }
+
+            // Récupérer en BDD l'utilisateur par son email (User.findOne ---> {...} || null)
+            const user = await User.findOne({ where: { email : email } }); // { id, password, email }
+
+            // Si pas d'utilisateur --> 400 : message d'erreur (rester vague !) + RETURN
+            if (!user) {
+                return res.status(400).json({ error: "L'email et le mot de passe fournis ne correspondent pas." });
+            }
+
+            // Vérifier si le mot de passe est valide 
+            const passwordValid = await argon2.verify(user.password, password)
+
+            // Si les mots de passe ne match pas --> 400 : message d'erreur (rester vague) + RETURN
+            if (! passwordValid) {
+                return res.status(400).json({ error: "L'email et le mot de passe fournis ne correspondent pas." });
+            }
+
+            res.status(200).json({  successMessage: "Connexion valide!" });
+        } catch (err) {
+            console.error('loginUser error →', err);
+            return res.status(500).json({ error: 'Erreur serveur, veuillez réessayer plus tard.' });
+        }
+    },
+
     async getAllUsers(req, res) {
         const users = await User.findAll();
       
