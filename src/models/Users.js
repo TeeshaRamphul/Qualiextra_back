@@ -1,4 +1,3 @@
-
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "./sequelize-client.js";
 
@@ -21,11 +20,6 @@ User.init({
   password: {
     type: DataTypes.TEXT,
     allowNull: false
-  },
-  role: {
-    type: DataTypes.ENUM('admin', 'member'), // ENUM limite le role: soit admin ou member
-    allowNull: false,
-    defaultValue: 'member' // Le rôle par défaut est 'member'
   }
 
 }, {
