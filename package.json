@@ -4,5 +4,25 @@
     "express": "^5.1.0",
     "pg": "^8.15.6",
     "sequelize": "^6.37.7"
-  }
+  },
+  "name": "qualiextra_back",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "dev": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeeshaRamphul/Qualiextra_back.git"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TeeshaRamphul/Qualiextra_back/issues"
+  },
+  "homepage": "https://github.com/TeeshaRamphul/Qualiextra_back#readme"
 }

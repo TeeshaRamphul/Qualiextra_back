@@ -1,5 +1,5 @@
 import { sequelize } from "../models/sequelize-client.js"; // chemin selon ton projet
-import { Users } from "../models/Users.js"; // ton modèle User
+import { User } from "../models/User.js"; // ton modèle User
 
 async function createTables() {
   try {
@@ -7,7 +7,7 @@ async function createTables() {
     await sequelize.drop(); // drop tout ce qui match "user"
 
     // Synchroniser ton modèle User => ça crée la table automatiquement
-    await Users.sync(); // force:true = drop puis recreate la table proprement
+    await User.sync(); // force:true = drop puis recreate la table proprement
 
     console.log('✅ Table "user" created successfully!');
   } catch (error) {
