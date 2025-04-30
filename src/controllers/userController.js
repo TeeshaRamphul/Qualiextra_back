@@ -2,6 +2,16 @@ import { User } from "../models/User.js";
 
 const userController = {
 
+    async createUser(req, res) {
+        // Enregistrer la nouvelle liste en DB
+        const user = await User.create(req.body);
+        
+        if (!user){
+            return next(error);
+        }
+        res.status(201).json(user);
+    },
+
     async getAllUsers(req, res) {
         const users = await User.findAll();
       
