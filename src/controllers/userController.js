@@ -1,5 +1,8 @@
 import PasswordValidator from "password-validator";
 import argon2 from "argon2";
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
 import { User } from "../models/User.js";
 
 
@@ -84,7 +87,15 @@ const userController = {
                 return res.status(400).json({ error: "L'email et le mot de passe fournis ne correspondent pas." });
             }
 
-            res.status(200).json({  successMessage: "Connexion valide!" });
+            const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+            const tokenExpiry = process.env.ACCESS_TOKEN_EXPIRES_IN;
+            const token = jwt.sign(
+                { id: user.id, email: user.email,firstname: user.firstname, role: user.role },  // Inclure le rôle dans le token
+                accessTokenSecret,
+                { expiresIn: tokenExpiry }  // Expiration de 1h
+            );
+
+            res.json({ token });
         } catch (err) {
             console.error('loginUser error →', err);
             return res.status(500).json({ error: 'Erreur serveur, veuillez réessayer plus tard.' });
@@ -149,7 +160,6 @@ const userController = {
 
         res.status(204);
     },
-
 }
 
 export { userController };

@@ -1,12 +1,4 @@
 {
-  "dependencies": {
-    "argon2": "^0.43.0",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "password-validator": "^5.3.0",
-    "pg": "^8.15.6",
-    "sequelize": "^6.37.7"
-  },
   "name": "qualiextra_back",
   "version": "1.0.0",
   "description": "",
@@ -25,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/TeeshaRamphul/Qualiextra_back/issues"
   },
-  "homepage": "https://github.com/TeeshaRamphul/Qualiextra_back#readme"
+  "homepage": "https://github.com/TeeshaRamphul/Qualiextra_back#readme",
+  "dependencies": {
+    "argon2": "^0.43.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "password-validator": "^5.3.0",
+    "pg": "^8.15.6",
+    "sequelize": "^6.37.7"
+  }
 }
