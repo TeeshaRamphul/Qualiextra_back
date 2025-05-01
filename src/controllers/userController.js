@@ -76,7 +76,7 @@ const userController = {
 
             // Si pas d'utilisateur --> 400 : message d'erreur (rester vague !) + RETURN
             if (!user) {
-                return res.status(400).json({ error: "L'email et le mot de passe fournis ne correspondent pas." });
+                return res.status(400).json({ error: "Email ou mot de passe incorrect." });
             }
 
             // Vérifier si le mot de passe est valide 
@@ -84,13 +84,18 @@ const userController = {
 
             // Si les mots de passe ne match pas --> 400 : message d'erreur (rester vague) + RETURN
             if (! passwordValid) {
-                return res.status(400).json({ error: "L'email et le mot de passe fournis ne correspondent pas." });
+                return res.status(400).json({ error: "Email ou mot de passe incorrect." });
             }
 
             const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
             const tokenExpiry = process.env.ACCESS_TOKEN_EXPIRES_IN;
             const token = jwt.sign(
-                { id: user.id, email: user.email,firstname: user.firstname, role: user.role },  // Inclure le rôle dans le token
+                { 
+                    id: user.id, 
+                    email: user.email,
+                    firstname: user.firstname, 
+                    role: user.role 
+                },  // Inclure le rôle dans le token
                 accessTokenSecret,
                 { expiresIn: tokenExpiry }  // Expiration de 1h
             );
@@ -103,62 +108,80 @@ const userController = {
     },
 
     async getAllUsers(req, res) {
-        const users = await User.findAll();
-      
-        if (!users){
-            return res.status(400).json({ error: "L'email et le mot de passe fournis ne correspondent pas." });
+        try {
+          const users = await User.findAll();
+          
+          res.status(200).json(users);
+
+        } catch (err) {
+          console.error("Erreur lors de la récupération des utilisateurs :", err);
+          res.status(500).json({ error: "Erreur serveur lors de la récupération des utilisateurs." });
         }
-        res.status(200).json(users);
     },
 
     async getOneUser(req, res) {
-        const id = req.params.id;
-
-        if (req.user.role !== 'admin' && req.user.id != id) {
+        try {
+          const id = req.params.id;
+      
+          if (req.user.role !== 'admin' && req.user.id != id) {
             return res.status(403).json({ error: "Vous ne pouvez accéder qu'à votre propre profil." });
-        }
-
-        const user = await User.findByPk(id);
-        if (!user){
+          }
+      
+          const user = await User.findByPk(id);
+          if (!user) {
             return res.status(400).json({ error: "Utilisateur non trouvé." });
+          }
+      
+          res.status(200).json(user);
+        } catch (err) {
+          console.error("Erreur lors de la récupération de l'utilisateur :", err);
+          res.status(500).json({ error: "Erreur serveur lors de la récupération de l'utilisateur." });
         }
-
-        res.status(200).json(user);
     },
 
     async updateUser(req, res) {
-        const id = req.params.id;
+        try {
+            const id = req.params.id;
 
-        if (req.user.role !== 'admin' && req.user.id != id) {
-            return res.status(403).json({ error: "Vous ne pouvez modifier que votre propre profil." });
+            if (req.user.role !== 'admin' && req.user.id != id) {
+                return res.status(403).json({ error: "Vous ne pouvez modifier que votre propre profil." });
+            }
+            
+            const user = await User.findByPk(id);
+            if (!user){
+                return res.status(400).json({ error: "Utilisateur non trouvé." });
+            }
+
+            const { firstname, lastname, email } = req.body;
+            await user.update({ firstname, lastname, email });
+
+            res.status(200).json(user);
+        } catch (err) {
+            console.error("Erreur lors de la mise à jour de l'utilisateur :", err);
+            res.status(500).json({ error: "Erreur serveur lors de la mise à jour." });
         }
-        
-        const user = await User.findByPk(id);
-        if (!user){
-            return res.status(400).json({ error: "Utilisateur non trouvé." });
-        }
-
-        const { firstname, lastname, email, password } = req.body;
-        await user.update({ firstname, lastname, email, password });
-
-        res.status(200).json(user);
     },
 
     async deleteUser(req, res) {
-        const id = req.params.id;
+        try {
+            const id = req.params.id;
 
-        const user = await User.findByPk(id);
-        if (!user){
-            return res.status(400).json({ error: "Utilisateur non trouvé." });
+            const user = await User.findByPk(id);
+            if (!user){
+                return res.status(400).json({ error: "Utilisateur non trouvé." });
+            }
+
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({ error: "Vous n'êtes pas autorisé à supprimer cet utilisateur." });
+            }
+
+            await user.destroy();
+
+            res.status(204).send();
+        } catch (err) {
+            console.error("Erreur lors de la suppression de l'utilisateur :", err);
+            res.status(500).json({ error: "Erreur serveur lors de la suppression." });
         }
-
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({ error: "Vous n'êtes pas autorisé à supprimer cet utilisateur." });
-        }
-
-        await user.destroy();
-
-        res.status(204);
     },
 }
 

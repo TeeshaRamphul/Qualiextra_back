@@ -1,15 +1,20 @@
 import { Router } from 'express';
 import { userController }  from './controllers/userController.js'
+import { authenticateToken }  from './middleware/authenticateToken.js'
+import { checkAdmin } from './middleware/checkAdmin.js';
 
 const router = Router();
 
-router.post("/users", userController.registerUser);
-router.post("/login",    userController.loginUser);
+router.post("/register", userController.registerUser);
+router.post("/login", userController.loginUser);
 
-router.get("/users", userController.getAllUsers);
-router.get("/users/:id", userController.getOneUser);
-router.patch("/users/:id", userController.updateUser);
-router.delete("/users/:id", userController.deleteUser);
+router.get("/users", authenticateToken, checkAdmin, userController.getAllUsers);
+router.get("/users/:id",  authenticateToken, userController.getOneUser);
+router.patch("/users/:id",  authenticateToken, userController.updateUser);
+router.delete("/users/:id", authenticateToken, checkAdmin,userController.deleteUser);
 
+router.get("/private", authenticateToken, (req, res) => {
+    res.status(200).json({ message: `Hello ${req.user.firstname}` });
+});
 
 export { router };
