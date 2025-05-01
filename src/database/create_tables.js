@@ -3,15 +3,15 @@ import { User } from "../models/User.js"; // ton modèle User
 
 async function createTables() {
   try {
-    // Drop la table si elle existe
-    await sequelize.drop(); // drop tout ce qui match "user"
+    console.log(' Suppression de la table "user"...');
+    await sequelize.getQueryInterface().dropTable('user'); // Supprime uniquement la table "user"
 
-    // Synchroniser ton modèle User => ça crée la table automatiquement
-    await User.sync(); // force:true = drop puis recreate la table proprement
+    console.log('Synchronisation du modèle User...');
+    await User.sync({ force: true }); // Recréation de la table avec le modèle
 
-    console.log('✅ Table "user" created successfully!');
+    console.log('Table "user" créée avec succès!');
   } catch (error) {
-    console.error('❌ Error creating table:', error);
+    console.error('❌ Erreur lors de la création de la table:', error);
   }
 }
 
