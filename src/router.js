@@ -6,6 +6,10 @@ import { checkAdmin } from './middleware/checkAdmin.js';
 const router = Router();
 
 router.post("/register", userController.registerUser);
+// routes/userRoutes.js ou routes/index.js
+router.get("/verify-email", userController.verifyEmail);
+
+
 router.post("/login", userController.loginUser);
 
 router.get("/users", authenticateToken, checkAdmin, userController.getAllUsers);

@@ -3,8 +3,19 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 dotenv.config();
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
+import validator from 'validator';
 import { User } from "../models/User.js";
 
+const transporter = nodemailer.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 587,
+    auth: {
+      user: "7a1c8c088814d1",
+      pass: "652049919f7d56"
+    }
+  });
 
 const userController = {
      
@@ -56,13 +67,38 @@ const userController = {
  *         description: "Erreur lors de l'enregistrement de l'utilisateur."
  */
 
+
     async registerUser(req, res) {
-        // Récupérer les données du body
+        // Récupérer les données du body et vérifier que tous les champs sont présents
         const { firstname, lastname, email, password, role } = req.body;
 
-        // Vérifier que tous les champs sont présents
         if (!firstname || !lastname || !email || !password) {
             return res.status(400).json({ error: 'Tous les champs (firstname, lastname, email, password) sont obligatoires.' });
+        }
+
+        //Vérification du format/domaine jetable du mail et si elle existe
+        const disposableEmailDomains = [
+            "mailinator.com",
+            "temp-mail.org",
+            "10minutemail.com",
+            "guerrillamail.com",
+            "yopmail.com",
+            "trashmail.com",
+            "maildrop.cc",
+        ];
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({ error: "Le format de l'adresse email est invalide." });
+        }
+
+        const domain = email.split("@")[1].toLowerCase();
+        if (disposableEmailDomains.includes(domain)) {
+            return res.status(400).json({ error: "Les adresses email jetables ne sont pas autorisées." });
+        }
+
+        const existing = await User.findOne({ where: { email: email }});
+            if (existing) {
+            return res.status(409).json({ error: "L'email renseigné est déjà utilisé." });
         }
 
         // Vérifier que le mot de passe est suffisamment complexe
@@ -78,18 +114,10 @@ const userController = {
         if (! schema.validate(password)) {
             return res.status(400).json({ error: "Le mot de passe n'est pas suffisamment complexe. Veuillez utiliser au moins 12 caractères, une majuscule, une minuscule, un chiffre et un symbole." });
         }
-    
-        // Vérifier si un utilisateur avec le même email n'existe pas déjà en BDD => faire une requête pour récupérer un utilisateur par son email
-        const existing = await User.findOne({ where: { email: email }});
-        if (existing) {
-            return res.status(409).json({ error: "L'email renseigné est déjà utilisé." });
-        }
-
-        // Vérifier le format de l'email --> on pourrait envoyer un mail de validation
-
         
-        // Hacher le mot de passe (pour ne pas le sauvegarder en clair)
         const hash = await argon2.hash(password);
+        const emailVerificationToken = uuidv4();
+
     
         // Sauvegarder l'utilisateur en BDD (via le model User)
         try {
@@ -99,15 +127,54 @@ const userController = {
                 email,
                 password: hash,
                 role: role || 'member',
+                isVerified: false,
+                emailVerificationToken
+            });
+
+            const verificationUrl = `http://localhost:3000/verify-email?token=${emailVerificationToken}`;
+
+            await transporter.sendMail({
+              from: '"Qualiextra" <no-reply@qualiextra.com>',
+              to: email,
+              subject: "Vérification de votre adresse email",
+              text: `Bonjour ${ firstname }, veuillez cliquer sur ce lien pour vérifier votre adresse : ${verificationUrl}`,
+              html: `<p>Bonjour ${ firstname },</p><p>Veuillez vérifier votre adresse email en cliquant sur ce lien : <a href="${verificationUrl}">${verificationUrl}</a></p>`
             });
     
-            return res.status(201).json({ successMessage: "Utilisateur créé avec succès." });
+            return res.status(201).json({ successMessage: "Utilisateur créé avec succès. Un email de vérification a été envoyé." });
     
         } catch (error) {
             console.error('Erreur lors de l\'enregistrement de l\'utilisateur :', error);
             return res.status(500).json({ error: "Erreur lors de l'enregistrement de l'utilisateur." });
         }
     },
+
+    async verifyEmail(req, res) {
+        const { token } = req.query;
+      
+        if (!token) {
+            return res.status(400).json({ error: "Token manquant." });
+        }
+      
+        try {
+            const user = await User.findOne({ where: { emailVerificationToken: token } });
+        
+            if (!user) {
+                return res.status(400).json({ error: "Lien invalide ou expiré." });
+            }
+        
+            user.isVerified = true;
+            user.emailVerificationToken = null; // On supprime le token après vérification
+            await user.save();
+        
+            return res.status(200).json({ message: "Adresse email vérifiée avec succès." });
+        
+        } catch (error) {
+            console.error("Erreur vérification email:", error);
+            return res.status(500).json({ error: "Erreur lors de la vérification de l'email." });
+        }
+      },
+      
     
 
     //<------------------------------------------------------------>
@@ -169,6 +236,10 @@ const userController = {
             // Si pas d'utilisateur --> 400 : message d'erreur (rester vague !) + RETURN
             if (!user) {
                 return res.status(400).json({ error: "Email ou mot de passe incorrect." });
+            }
+
+            if (!user.isVerified) {
+                return res.status(403).json({ error: "Veuillez vérifier votre adresse email avant de vous connecter." });
             }
 
             // Vérifier si le mot de passe est valide 

@@ -25,7 +25,16 @@ User.init({
     type: DataTypes.ENUM('admin', 'member'), // ENUM limite le role a soit admin ou member
     allowNull: false,
     defaultValue: 'member' // Le rôle par défaut est 'member'
-  }
+  },
+  isVerified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  emailVerificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true 
+  },
 
 }, {
   sequelize,
