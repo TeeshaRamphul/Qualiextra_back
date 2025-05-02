@@ -1,5 +1,5 @@
-import { sequelize } from "../models/sequelize-client.js"; // chemin selon ton projet
-import { User } from "../models/User.js"; // ton modèle User
+import { sequelize } from "../models/sequelize-client.js"; 
+import { User } from "../models/User.js"; 
 
 async function createTables() {
   try {
@@ -11,7 +11,7 @@ async function createTables() {
 
     console.log('Table "user" créée avec succès!');
   } catch (error) {
-    console.error('❌ Erreur lors de la création de la table:', error);
+    console.error('Erreur lors de la création de la table:', error);
   }
 }
 
