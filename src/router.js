@@ -15,8 +15,6 @@ router.get("/users/:id",  authenticateToken, userController.getOneUser);
 router.patch("/users/:id",  authenticateToken, userController.updateUser);
 router.delete("/users/:id", authenticateToken, checkAdmin,userController.deleteUser);
 
-router.get("/private", authenticateToken, (req, res) => {
-    res.status(200).json({ message: `Hello ${req.user.firstname}` });
-});
+router.get("/private", authenticateToken, authController.private);
 
 export { router };

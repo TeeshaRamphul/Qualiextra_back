@@ -292,6 +292,40 @@ const authController = {
             return res.status(500).json({ error: 'Erreur serveur.' });
         }
     },
+
+    /**
+ * @swagger
+ * /private:
+ *   get:
+ *     summary: Accès à une ressource protégée
+ *     description: Retourne un message de bienvenue à l'utilisateur authentifié.
+ *     tags:
+ *       - Utilisateurs
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Succès - L'utilisateur est authentifié
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Hello John
+ *       401:
+ *         description: Non autorisé - Token manquant ou invalide
+ *       403:
+ *         description: Accès refusé
+ */
+
+
+    async private(req, res) {
+        res.status(200).json({ message: `Hello ${req.user.firstname}` });
+    }
 }
+
+
 
 export { authController };

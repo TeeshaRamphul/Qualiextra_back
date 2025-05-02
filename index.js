@@ -19,7 +19,6 @@ app.use(router);
 // Lancement du serveur
 const port = process.env.PORT;
 app.listen(port, () => {
-  console.log(`🚀 Server started at http://localhost:${port}`);
   console.log(`📚 Swagger available at http://localhost:${port}/api-docs`);
 
 });

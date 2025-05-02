@@ -23,7 +23,6 @@
   "homepage": "https://github.com/TeeshaRamphul/Qualiextra_back#readme",
   "dependencies": {
     "argon2": "^0.43.0",
-    "disposable-email-domains": "^1.0.62",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
