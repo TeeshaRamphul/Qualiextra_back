@@ -4,7 +4,7 @@ import { User } from "../models/User.js";
 async function createTables() {
   try {
     console.log(' Suppression de la table "user"...');
-    await sequelize.getQueryInterface().dropTable('user'); // Supprime uniquement la table "user"
+    await sequelize.getQueryInterface().dropTable('user', {}); // Supprime uniquement la table "user"
 
     console.log('Synchronisation du modèle User...');
     await User.sync({ force: true }); // Recréation de la table avec le modèle

@@ -19,8 +19,17 @@ Installez toutes les dépendances nécessaires à l'application en utilisant npm
 ```
 npm install
 ```
+## 3. Créer l'utilisateur et initialiser la base de données
+Commence par créer un utilisateur PostgreSQL nommé qualiextra avec les privilèges de superutilisateur :
+```
+createuser -s qualiextra
+```
+Ensuite, lance la commande suivante pour créer et initialiser la base de données à l’aide du script défini dans ton projet :
+```
+npm run db:create
+```
 
-## 3. Configurer les Variables d'Environnement
+## 4. Configurer les Variables d'Environnement
 
 À la racine de votre projet, créez un fichier .env :
 
@@ -55,15 +64,6 @@ MAILTRAP_PASS="#"
 - ACCESS_TOKEN_EXPIRES_IN : La durée d'expiration du JWT. Par défaut, c'est 4h (4 heures).
 
 - MAILTRAP_USER et MAILTRAP_PASS : Les identifiants pour utiliser Mailtrap. Si vous utilisez un autre service SMTP, remplacez-les par les informations nécessaires.
-
-## 4. Initialiser et peupler la base de données
-
-Avant de démarrer l'application, vous devez créer et initialiser la base de données. Pour ce faire, utilisez la commande suivante pour créer les tables dans votre base de données :
-
-```
-npm run db:create
-```
-Cette commande exécutera un script pour créer les tables nécessaires dans votre base de données.
 
 ## 5. Lancer l'application
 
